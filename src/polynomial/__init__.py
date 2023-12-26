@@ -23,9 +23,10 @@ class Polynomial:
     __slots__ = '_coeffs'
 
     def __init__(self, *args: Complex) -> None:
-        assert all(isinstance(n, Complex) for n in args), \
-            "All coefficients must be numbers."
-        assert len(args) == 0 or args[0] != 0, "First coeff must not be zero!"
+        if any(not isinstance(n, Complex) for n in args):
+            raise ValueError("All coefficients must be numbers.")
+        if len(args) > 0 and args[0] == 0:
+            raise ValueError("First coeff must not be zero!")
         self._coeffs = tuple(args)
 
     def degree(self) -> int:
