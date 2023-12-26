@@ -56,6 +56,23 @@ class Polynomial:
     def __deepcopy__(self) -> Self:
         return self.__copy__()
 
+    def eval(self, x: Complex) -> Complex:
+        """
+        Evaluates the polynomial at value `x`.
+
+        Args:
+            x (Complex): The value to evaluate the polynomial at
+
+        Returns:
+            f(x) : The value of the polynomial at `x`
+        """
+        fx = 0
+        for coeff in self._coeffs[:-1]:
+            fx = (fx + coeff) * x
+        return fx + self._coeffs[-1] if self._coeffs else 0
+
+    __call__ = eval
+
     def __repr__(self) -> str:
         return "%s(%s)" % (self.__class__.__name__,
                            ", ".join(str(c) for c in self._coeffs))
