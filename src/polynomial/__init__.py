@@ -38,15 +38,29 @@ class Polynomial:
 
     def __eq__(self, other: Self) -> bool:
         """
-        Compares two polynomials.
+        `self` == `other`
 
-        Args:
-            other: Some other polynomial
-
-        Returns:
-            true if both polynomials are equal, false otherwise
+        Two polynomials are considered equal if their coefficients are equal.
         """
         return self._coeffs == other._coeffs
+
+    def __gt__(self, other: Self) -> bool:
+        """
+        `self` > `other`
+
+        A polynomials is considered greater than another if its degree is
+        greater than the others degree or - in case the degrees are equal - if
+        its coefficients are greater than the others coefficients.
+        """
+        if len(self._coeffs) == len(other._coeffs):
+            return self._coeffs > other._coeffs
+        return len(self._coeffs) > len(other._coeffs)
+
+    def __ge__(self, other: Self) -> bool:
+        """`self` >= `other`"""
+        if len(self._coeffs) == len(other._coeffs):
+            return self._coeffs >= other._coeffs
+        return len(self._coeffs) > len(other._coeffs)
 
     def __hash__(self) -> int:
         return hash(self._coeffs)

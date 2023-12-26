@@ -25,3 +25,15 @@ def test_equality(lhs: Polynomial, rhs: Polynomial) -> None:
         assert lhs == rhs
     else:
         assert lhs != rhs
+
+
+@pytest.mark.parametrize("lhs", [Polynomial(3, 0, 0, -1),
+                                 Polynomial(2, 7, 0, 4)])
+@pytest.mark.parametrize("rhs", [Polynomial(),
+                                 Polynomial(2, 0, 2, -1),
+                                 Polynomial(17, 0, 4)])
+def test_inequality(lhs: Polynomial, rhs: Polynomial) -> None:
+    assert lhs > rhs
+    assert lhs >= rhs
+    assert rhs < lhs
+    assert rhs <= lhs
