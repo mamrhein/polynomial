@@ -10,8 +10,8 @@
 
 
 """Polynomials"""
-from itertools import dropwhile, chain, repeat
-from numbers import Number
+from itertools import dropwhile, chain, repeat, product
+from numbers import Complex
 from operator import add, sub
 from typing import Self, Union
 
@@ -22,8 +22,8 @@ class Polynomial:
     """
     __slots__ = '_coeffs'
 
-    def __init__(self, *args: int) -> None:
-        assert all(isinstance(n, Number) for n in args), \
+    def __init__(self, *args: Complex) -> None:
+        assert all(isinstance(n, Complex) for n in args), \
             "All coefficients must be numbers."
         assert len(args) == 0 or args[0] != 0, "First coeff must not be zero!"
         self._coeffs = tuple(args)
@@ -107,10 +107,10 @@ class Polynomial:
                                        zip(lhs_it, rhs_it))))
         return res
 
-    def __add__(self, other: Union[Self, Number]):
+    def __add__(self, other: Union[Self, Complex]) -> Self:
         if isinstance(other, Polynomial):
             return self._add_sub(other, add)
-        if isinstance(other, Number):
+        if isinstance(other, Complex):
             if len(self._coeffs) == 0:
                 return Polynomial(other)
             return Polynomial(*self._coeffs[:-1], self._coeffs[-1] + other)
@@ -118,17 +118,32 @@ class Polynomial:
 
     __radd__ = __add__
 
-    def __sub__(self, other: Union[Self, Number]):
+    def __sub__(self, other: Union[Self, Complex]) -> Self:
         if isinstance(other, Polynomial):
             return self._add_sub(other, sub)
-        if isinstance(other, Number):
+        if isinstance(other, Complex):
             if len(self._coeffs) == 0:
                 return Polynomial(-other)
             return Polynomial(*self._coeffs[:-1], self._coeffs[-1] - other)
         raise TypeError(f"Can't sub {type(other)}")
 
-    def __rsub__(self, other: Union[Self, Number]):
+    def __rsub__(self, other: Union[Self, Complex]) -> Self:
         return -self + other
+
+    def __mul__(self, other: Union[Self, Complex]) -> Self:
+        if isinstance(other, Polynomial):
+            coeffs = list(
+                repeat(0, len(self._coeffs) + len(other._coeffs) - 1))
+            it = product(enumerate(self._coeffs), enumerate(other._coeffs))
+            for ((lhs_idx, lhs_val), (rhs_idx, rhs_val)) in it:
+                coeffs[lhs_idx + rhs_idx] += lhs_val * rhs_val
+            return Polynomial(*(dropwhile(lambda x: x == 0, coeffs)))
+        if isinstance(other, Complex):
+            if other == 0:
+                return Polynomial()
+            return Polynomial(*((c * other) for c in self._coeffs))
+
+    __rmul__ = __mul__
 
 
 Polynomial.ZERO = Polynomial()
