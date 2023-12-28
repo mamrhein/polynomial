@@ -9,28 +9,36 @@
 # $Revision$
 
 
-"""Univariate polynomials"""
+"""Univariate polynomials with rational coefficients."""
 
 __all__ = ['Polynomial']
 
+from fractions import Fraction
 from itertools import dropwhile, chain, repeat, product
-from numbers import Complex
+from numbers import Rational
 from operator import add, sub
-from typing import Self, Union
+from typing import Union
+
+try:
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
 
 
 class Polynomial:
     """
-    Represents an univariate polynomial.
+    Represents an univariate polynomial with rational coefficients.
     """
     __slots__ = '_coeffs'
 
-    def __init__(self, *args: Complex) -> None:
-        if any(not isinstance(n, Complex) for n in args):
-            raise ValueError("All coefficients must be numbers.")
+    def __init__(self, *args: Rational) -> None:
+        # Assign to slot first and check later in order to avoid exception
+        # in call of __repr__ in error reporting.
+        self._coeffs = tuple(args)
+        if any(not isinstance(n, Rational) for n in args):
+            raise ValueError("All coefficients must be rational numbers.")
         if len(args) > 0 and args[0] == 0:
             raise ValueError("First coeff must not be zero!")
-        self._coeffs = tuple(args)
 
     def degree(self) -> int:
         """
@@ -74,12 +82,12 @@ class Polynomial:
     def __deepcopy__(self) -> Self:
         return self.__copy__()
 
-    def eval(self, x: Complex) -> Complex:
+    def eval(self, x: Rational) -> Rational:
         """
         Evaluates the polynomial at value `x`.
 
         Args:
-            x (Complex): The value to evaluate the polynomial at
+            x (Rational): The value to evaluate the polynomial at
 
         Returns:
             f(x) : The value of the polynomial at `x`
@@ -93,7 +101,7 @@ class Polynomial:
 
     def __repr__(self) -> str:
         return "%s(%s)" % (self.__class__.__name__,
-                           ", ".join(str(c) for c in self._coeffs))
+                           ", ".join(repr(c) for c in self._coeffs))
 
     def _term(self, i: int) -> str:
         c = self._coeffs[i]
@@ -142,10 +150,10 @@ class Polynomial:
                                        zip(lhs_it, rhs_it))))
         return res
 
-    def __add__(self, other: Union[Self, Complex]) -> Self:
+    def __add__(self, other: Union[Self, Rational]) -> Self:
         if isinstance(other, Polynomial):
             return self._add_sub(other, add)
-        if isinstance(other, Complex):
+        if isinstance(other, Rational):
             if len(self._coeffs) == 0:
                 return Polynomial(other)
             return Polynomial(*self._coeffs[:-1], self._coeffs[-1] + other)
@@ -153,19 +161,19 @@ class Polynomial:
 
     __radd__ = __add__
 
-    def __sub__(self, other: Union[Self, Complex]) -> Self:
+    def __sub__(self, other: Union[Self, Rational]) -> Self:
         if isinstance(other, Polynomial):
             return self._add_sub(other, sub)
-        if isinstance(other, Complex):
+        if isinstance(other, Rational):
             if len(self._coeffs) == 0:
                 return Polynomial(-other)
             return Polynomial(*self._coeffs[:-1], self._coeffs[-1] - other)
         raise TypeError(f"Can't sub {type(other)}")
 
-    def __rsub__(self, other: Union[Self, Complex]) -> Self:
+    def __rsub__(self, other: Union[Self, Rational]) -> Self:
         return -self + other
 
-    def __mul__(self, other: Union[Self, Complex]) -> Self:
+    def __mul__(self, other: Union[Self, Rational]) -> Self:
         if isinstance(other, Polynomial):
             coeffs = list(
                 repeat(0, len(self._coeffs) + len(other._coeffs) - 1))
@@ -173,12 +181,50 @@ class Polynomial:
             for ((lhs_idx, lhs_val), (rhs_idx, rhs_val)) in it:
                 coeffs[lhs_idx + rhs_idx] += lhs_val * rhs_val
             return Polynomial(*(dropwhile(lambda x: x == 0, coeffs)))
-        if isinstance(other, Complex):
+        if isinstance(other, Rational):
             if other == 0:
                 return Polynomial()
             return Polynomial(*((c * other) for c in self._coeffs))
 
     __rmul__ = __mul__
+
+    def __divmod__(self, other: Union[Self, Rational]) -> (Self, Self):
+        if isinstance(other, Polynomial):
+            # Expanded synthetic division
+            if other == Polynomial.ZERO:
+                raise ZeroDivisionError("Cannot divide by zero.")
+            d = other.degree()
+            qr = list(self._coeffs)
+            n = other._coeffs[0]
+            for i in range(len(self._coeffs) - d):
+                c = Fraction(qr[i] / n)
+                if c.denominator == 1:
+                    c = c.numerator
+                qr[i] = c
+                if c != 0:
+                    for j in range(1, len(other._coeffs)):
+                        qr[i + j] -= c * other._coeffs[j]
+            return (Polynomial(*qr[:-d]),
+                    Polynomial(*dropwhile(lambda a: a == 0, qr[-d:])))
+        if isinstance(other, Rational):
+            if other == 0:
+                raise ZeroDivisionError("Cannot divide by zero.")
+            return divmod(self, Polynomial(other))
+
+    def __rdivmod__(self, other: Rational) -> (Self, Self):
+        return divmod(Polynomial(other), self)
+
+    def __floordiv__(self, other: Union[Self, Rational]) -> Self:
+        return divmod(self, other)[0]
+
+    def __rfloordiv__(self, other: Rational) -> Self:
+        return divmod(other, self)[0]
+
+    def __mod__(self, other: Union[Self, Rational]) -> Self:
+        return divmod(self, other)[1]
+
+    def __rmod__(self, other: Rational) -> Self:
+        return divmod(other, self)[1]
 
 
 Polynomial.ZERO = Polynomial()
