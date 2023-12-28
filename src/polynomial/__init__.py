@@ -9,7 +9,10 @@
 # $Revision$
 
 
-"""Polynomials"""
+"""Univariate polynomials"""
+
+__all__ = ['Polynomial']
+
 from itertools import dropwhile, chain, repeat, product
 from numbers import Complex
 from operator import add, sub
@@ -18,7 +21,7 @@ from typing import Self, Union
 
 class Polynomial:
     """
-    Represents a polynomial.
+    Represents an univariate polynomial.
     """
     __slots__ = '_coeffs'
 
