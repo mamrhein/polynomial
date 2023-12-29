@@ -22,5 +22,5 @@ def test_leading_arg_zero() -> None:
 
 
 def test_non_number_in_args() -> None:
-    with pytest.raises(ValueError):
-        Polynomial(1, 3, 'a', 4)
+    with pytest.raises(TypeError):
+        Polynomial(1, 3, 2., 4)

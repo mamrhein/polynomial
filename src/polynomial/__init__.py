@@ -32,11 +32,21 @@ class Polynomial:
     __slots__ = '_coeffs'
 
     def __init__(self, *args: Rational) -> None:
+        """
+        Initialize new `Polynomial` instance.
+
+        Args:
+            *args: list of Rational coefficients
+
+        Raises:
+            TypeError: If any of the arguments is not a Rational instance.
+            ValueError: If the first argument is equal to zero.
+        """
         # Assign to slot first and check later in order to avoid exception
         # in call of __repr__ in error reporting.
         self._coeffs = tuple(args)
         if any(not isinstance(n, Rational) for n in args):
-            raise ValueError("All coefficients must be rational numbers.")
+            raise TypeError("All coefficients must be rational numbers.")
         if len(args) > 0 and args[0] == 0:
             raise ValueError("First coeff must not be zero!")
 
@@ -74,12 +84,15 @@ class Polynomial:
         return len(self._coeffs) > len(other._coeffs)
 
     def __hash__(self) -> int:
+        """hash(self)"""
         return hash(self._coeffs)
 
     def __copy__(self) -> Self:
+        """copy(self)"""
         return self
 
     def __deepcopy__(self) -> Self:
+        """deepcopy(self)"""
         return self.__copy__()
 
     def eval(self, x: Rational) -> Rational:
@@ -87,10 +100,10 @@ class Polynomial:
         Evaluates the polynomial at value `x`.
 
         Args:
-            x (Rational): The value to evaluate the polynomial at
+            x: The value to evaluate the polynomial at
 
         Returns:
-            f(x) : The value of the polynomial at `x`
+            f(x): The value of the polynomial at `x`
         """
         fx = 0
         for coeff in self._coeffs[:-1]:
@@ -100,6 +113,7 @@ class Polynomial:
     __call__ = eval
 
     def __repr__(self) -> str:
+        """repr(self)"""
         return "%s(%s)" % (self.__class__.__name__,
                            ", ".join(repr(c) for c in self._coeffs))
 
@@ -125,6 +139,7 @@ class Polynomial:
             return f"{s}{x}{str(e).translate(_to_superscript)}"
 
     def __str__(self) -> str:
+        """str(self)"""
         n = len(self._coeffs)
         if n == 0:
             return "f(x) = 0"
@@ -134,6 +149,7 @@ class Polynomial:
         return s
 
     def __neg__(self) -> Self:
+        """-self"""
         res = Polynomial()
         res._coeffs = tuple(-a for a in self._coeffs)
         return res
@@ -151,6 +167,7 @@ class Polynomial:
         return res
 
     def __add__(self, other: Union[Self, Rational]) -> Self:
+        """self + other"""
         if isinstance(other, Polynomial):
             return self._add_sub(other, add)
         if isinstance(other, Rational):
@@ -162,6 +179,7 @@ class Polynomial:
     __radd__ = __add__
 
     def __sub__(self, other: Union[Self, Rational]) -> Self:
+        """self - other"""
         if isinstance(other, Polynomial):
             return self._add_sub(other, sub)
         if isinstance(other, Rational):
@@ -171,9 +189,11 @@ class Polynomial:
         raise TypeError(f"Can't sub {type(other)}")
 
     def __rsub__(self, other: Union[Self, Rational]) -> Self:
+        """other - self"""
         return -self + other
 
     def __mul__(self, other: Union[Self, Rational]) -> Self:
+        """self * other"""
         if isinstance(other, Polynomial):
             coeffs = list(
                 repeat(0, len(self._coeffs) + len(other._coeffs) - 1))
@@ -189,6 +209,7 @@ class Polynomial:
     __rmul__ = __mul__
 
     def __divmod__(self, other: Union[Self, Rational]) -> (Self, Self):
+        """divmod(self, other)"""
         if isinstance(other, Polynomial):
             # Expanded synthetic division
             if other == Polynomial.ZERO:
@@ -212,18 +233,23 @@ class Polynomial:
             return divmod(self, Polynomial(other))
 
     def __rdivmod__(self, other: Rational) -> (Self, Self):
+        """divmod(other, self)"""
         return divmod(Polynomial(other), self)
 
     def __floordiv__(self, other: Union[Self, Rational]) -> Self:
+        """self // other"""
         return divmod(self, other)[0]
 
     def __rfloordiv__(self, other: Rational) -> Self:
+        """other // self"""
         return divmod(other, self)[0]
 
     def __mod__(self, other: Union[Self, Rational]) -> Self:
+        """self % other"""
         return divmod(self, other)[1]
 
     def __rmod__(self, other: Rational) -> Self:
+        """other % self"""
         return divmod(other, self)[1]
 
 
