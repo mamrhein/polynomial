@@ -27,7 +27,28 @@ except ImportError:
 
 class Polynomial:
     """
-    Represents an univariate polynomial with rational coefficients.
+    Represents univariate polynomials with rational coefficients.
+
+    In order to create an instance of `Polynomial`, call the class and provide
+    a list of Rational numbers corresponding to the coefficients of the
+    polynomial (in descending order: aₙ, aₙ₋₁, … a₁, a₀). Calling the class
+    without any parameters will create a "zero polynomial".
+
+    Examples
+    ========
+    >>> from polynomial import Polynomial
+    >>> from fractions import Fraction
+    >>> z = Polynomial()
+    >>> z
+    Polynomial()
+    >>> f = Polynomial(1, -7, 0, 4)
+    >>> repr(f)
+    'Polynomial(1, -7, 0, 4)'
+    >>> print(f)
+    f(x) = x³ - 7⋅x² + 4
+    >>> g = Polynomial(Fraction(1, 2), 0, 0, 0, Fraction(1, 4), 3)
+    >>> str(g)
+    'f(x) = ¹/₂⋅x⁵ + ¹/₄⋅x + 3'
     """
     __slots__ = '_coeffs'
 
