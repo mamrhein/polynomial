@@ -159,6 +159,17 @@ def test_divmod_zero_polynomial(f: Polynomial) -> None:
                            Polynomial(2, 0, 2, -3),
                            Polynomial(3, -1, -3, Fraction(7, 2)),
                            Polynomial(3, -13, Fraction(27, 2)),),
+                          (Polynomial(4, -2, 0, -4, 0, 8, 3),
+                           Polynomial(8, 1, 7),
+                           Polynomial(Fraction(1, 2), Fraction(-5, 16),
+                                      Fraction(-51, 128), Fraction(-181, 1024),
+                                      Fraction(3037, 8192)),
+                           Polynomial(Fraction(72635, 8192),
+                                      Fraction(3317, 8192)),),
+                          (Polynomial(Fraction(1, 2), 0, Fraction(2, 3)),
+                           Polynomial(Fraction(1, 4), 1, 0),
+                           Polynomial(2),
+                           Polynomial(-2, Fraction(2, 3)),),
                           ])
 def test_divmod_polynomial(lhs: Polynomial, rhs: Polynomial,
                            quot: Polynomial, rem: Polynomial) \
