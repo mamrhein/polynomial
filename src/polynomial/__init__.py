@@ -114,15 +114,15 @@ class Polynomial:
         c = abs(c)
         e = self.degree() - i
         if e == 0:
-            return f"{s}{c}"
+            return f"{s}{_to_str(c)}"
         if c == 1:
             x = "x"
         else:
-            x = f"{c}x"
+            x = f"{_to_str(c)}⋅x"
         if e == 1:
             return f"{s}{x}"
         else:
-            return f"{s}{x}^{e}"
+            return f"{s}{x}{str(e).translate(_to_superscript)}"
 
     def __str__(self) -> str:
         n = len(self._coeffs)
@@ -228,3 +228,18 @@ class Polynomial:
 
 
 Polynomial.ZERO = Polynomial()
+
+# helper for conversion to str
+
+_to_superscript = str.maketrans("-0123456789", "⁻⁰¹²³⁴⁵⁶⁷⁸⁹")
+_to_subscript = str.maketrans("-0123456789", "₋₀₁₂₃₄₅₆₇₈₉")
+
+
+def _to_str(num: Rational) -> str:
+    if type(num) == int:
+        return str(num)
+    elif num.denominator == 1:
+        return str(num.numerator)
+    else:
+        return f"{str(num.numerator).translate(_to_superscript)}/" \
+               f"{str(num.denominator).translate(_to_subscript)}"

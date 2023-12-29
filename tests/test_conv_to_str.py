@@ -37,23 +37,23 @@ def test_repr_rational_coeffs(p: Polynomial, s: str) -> None:
 
 @pytest.mark.parametrize(("p", "s"), [(Polynomial(), "f(x) = 0"),
                                       (Polynomial(-238), "f(x) = -238"),
-                                      (Polynomial(7, -3), "f(x) = 7x - 3"),
+                                      (Polynomial(7, -3), "f(x) = 7⋅x - 3"),
                                       (Polynomial(1, 7, 0, 4),
-                                       "f(x) = x^3 + 7x^2 + 4"),
+                                       "f(x) = x³ + 7⋅x² + 4"),
                                       (Polynomial(5, 0, 0, -1, -1, 19),
-                                       "f(x) = 5x^5 - x^2 - x + 19")])
+                                       "f(x) = 5⋅x⁵ - x² - x + 19")])
 def test_str_int_coeffs(p: Polynomial, s: str) -> None:
     assert str(p) == s
 
 
 @pytest.mark.parametrize(("p", "s"),
-                         [(Polynomial(Fraction(-23, 8)), "f(x) = -23/8"),
-                          (Polynomial(Fraction(7, 2), -3), "f(x) = 7/2x - 3"),
+                         [(Polynomial(Fraction(-23, 8)), "f(x) = -²³/₈"),
+                          (Polynomial(Fraction(7, 2), -3), "f(x) = ⁷/₂⋅x - 3"),
                           (Polynomial(Fraction(1, 10), Fraction(7, 4),
                                       Fraction(0, 2), Fraction(-1, 4)),
-                           "f(x) = 1/10x^3 + 7/4x^2 - 1/4"),
+                           "f(x) = ¹/₁₀⋅x³ + ⁷/₄⋅x² - ¹/₄"),
                           (Polynomial(Fraction(5, 7), 0, 0, Fraction(-1),
-                                      Fraction(-1, 3), 19),
-                           "f(x) = 5/7x^5 - x^2 - 1/3x + 19")])
+                                      Fraction(-1, 3), Fraction(19, 1)),
+                           "f(x) = ⁵/₇⋅x⁵ - x² - ¹/₃⋅x + 19")])
 def test_str_rational_coeffs(p: Polynomial, s: str) -> None:
     assert str(p) == s
